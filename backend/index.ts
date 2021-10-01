@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
+import cities from './cities.json';
 
+import cors from 'cors';
 const app: Application = express();
 const PORT = 9999;
 app.use(express.json());
@@ -9,23 +11,41 @@ const client = new Client({
 });
 
 const INDEX = 'restaurants';
-
+app.use(cors());
 // Create data
 app.post('/restaurant', async (req: Request, res: Response) => {
   try {
-    const doc: RequestParams.Index = {
-      index: INDEX,
-      body: {
-        ...req.body,
-      },
-    };
+    let body: any = [];
 
-    await client.index(doc);
+    cities.forEach((city: any) => {
+      body.push({
+        index: {
+          _index: 'restaurants',
+        },
+      });
+      body.push(city);
+    });
+
+    console.log(body);
+
+    await client.bulk({ body: body });
+    // const doc: RequestParams.Index = {
+    //   index: INDEX,
+    //   body: {
+    //     ...req.body,
+    //   },
+    // };
+
+    // for (let i = 0; i <= 1000000; i++) {
+    //   (doc.body as any)['random'] = String(i);
+    //   await client.index(doc);
+    // }
 
     res.status(201).json({
       message: 'Success ✅',
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       message: 'Failed❌',
     });
@@ -43,6 +63,7 @@ interface Body {
     };
   };
 }
+
 // Search
 app.get('/search', async (req: Request, res: Response) => {
   try {
@@ -57,7 +78,7 @@ app.get('/search', async (req: Request, res: Response) => {
       const wildCardOption = [
         {
           wildcard: {
-            location: '*' + filterSearchString + '*',
+            country: '*' + filterSearchString + '*',
           },
         },
         {
@@ -65,11 +86,16 @@ app.get('/search', async (req: Request, res: Response) => {
             name: '*' + filterSearchString + '*',
           },
         },
-        {
-          wildcard: {
-            food: '*' + filterSearchString + '*',
-          },
-        },
+        // {
+        //   wildcard: {
+        //     'food.items': '*' + filterSearchString + '*',
+        //   },
+        // },
+        // {
+        //   wildcard: {
+        //     random: '*' + filterSearchString + '*',
+        //   },
+        // },
       ];
 
       const body: Body = {
@@ -83,11 +109,13 @@ app.get('/search', async (req: Request, res: Response) => {
       const result: ApiResponse = await client.search({
         index: INDEX,
         from: 0,
+        size: 10000,
         body: body,
       });
 
       res.status(200).json({
         message: 'Success✅',
+        count: result.body.hits.hits.length,
         data: result.body.hits.hits,
       });
     } else {
@@ -96,6 +124,7 @@ app.get('/search', async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: 'Something went wrong😰',
     });
