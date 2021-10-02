@@ -1,11 +1,41 @@
 import React, { useEffect, useState } from 'react';
 
 const style = {
-  width: '300px',
-  height: '300px',
-  marginBottom: '1rem',
-  margin: '0 auto',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+  app: {
+    width: '100%',
+    heght: '100%',
+  },
+  container: {
+    padding: '1rem',
+  },
+  card: {
+    width: '20vw',
+    height: '100%',
+    padding: '0 1rem',
+
+    marginBottom: '1rem',
+    margin: '0 auto',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+  },
+  flexBox: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+
+  input: {
+    padding: '.5rem 1rem',
+    marginBottom: '.4rem',
+    width: '20vw',
+  },
+  ul: {
+    listStyleType: 'none',
+  },
+  li: {
+    padding: '.5rem',
+    cursor: 'pointer',
+  },
 };
 
 const App: React.FC = () => {
@@ -20,12 +50,12 @@ const App: React.FC = () => {
 
   const renderResult = (r: object[]) => {
     const data = r.map((el: any, ind: number) => (
-      <div key={ind} className='result' style={style}>
-        <p>Food: {el.name}</p>
-        <p>Location: {el.location}</p>
-
-        <p>Food</p>
-        <ul>{renderFood(el.food[0].items)}</ul>
+      <div key={ind} className='result' style={style.card}>
+        <ul>
+          <li>
+            {el.name},{el.country}
+          </li>
+        </ul>
       </div>
     ));
 
@@ -38,23 +68,34 @@ const App: React.FC = () => {
         setResult([]);
         return;
       }
-      setTimeout(async () => {
-        const url = `http://localhost:9999/search?s=${search}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        const filterData = data.data.map((el: any) => el._source);
-        setResult(filterData);
-      }, 1000);
+      const url = `http://localhost:9999/search?s=${search}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const filterData = data.data.map((el: any) => el._source);
+      setResult(filterData);
     };
     getData();
   }, [search]);
   return (
-    <div className='App'>
-      <input type='text' value={search} onChange={handleChange} />
-
-      <div>
-        <h2>Result</h2>
-        {/* {renderResult(result)} */}
+    <div className='App' style={style.app}>
+      <div className='container' style={style.container}>
+        <div className='flex-box' style={style.flexBox as React.CSSProperties}>
+          <input
+            style={style.input}
+            type='text'
+            value={search}
+            onChange={handleChange}
+          />
+          <div className='result' style={style.card}>
+            <ul style={style.ul}>
+              {result.map((el: any) => (
+                <li style={style.li}>
+                  {el.name},{el.country}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
