@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import useDebounce from './components/debouncer/Debouncer';
 const style = {
   app: {
     width: '100%',
@@ -39,43 +39,29 @@ const style = {
 };
 
 const App: React.FC = () => {
-  const [search, setText] = useState('');
+  const [search, setSearchText] = useState('');
   const [result, setResult] = useState([]);
+  const debounceValue = useDebounce(search, 500);
+
   const handleChange = (e: any) => {
-    setText(e.target.value);
-  };
-
-  const renderFood = (foods: any): HTMLElement =>
-    foods.map((food: any, ind: number) => <li key={ind}>{food}</li>);
-
-  const renderResult = (r: object[]) => {
-    const data = r.map((el: any, ind: number) => (
-      <div key={ind} className='result' style={style.card}>
-        <ul>
-          <li>
-            {el.name},{el.country}
-          </li>
-        </ul>
-      </div>
-    ));
-
-    return data;
+    setSearchText(e.target.value);
   };
 
   useEffect(() => {
     const getData = async () => {
-      if (!search) {
-        setResult([]);
-        return;
+      if (!debounceValue) {
+        return setResult([]);
       }
-      const url = `http://localhost:9999/search?s=${search}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      const filterData = data.data.map((el: any) => el._source);
-      setResult(filterData);
+      if (debounceValue) {
+        const url = `http://localhost:9999/restaurants/search?s=${debounceValue}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const filterData = data.data.map((el: any) => el._source);
+        setResult(filterData);
+      }
     };
     getData();
-  }, [search]);
+  }, [debounceValue]);
   return (
     <div className='App' style={style.app}>
       <div className='container' style={style.container}>
@@ -88,8 +74,8 @@ const App: React.FC = () => {
           />
           <div className='result' style={style.card}>
             <ul style={style.ul}>
-              {result.map((el: any) => (
-                <li style={style.li}>
+              {result.map((el: any, ind: number) => (
+                <li key={ind} style={style.li}>
                   {el.name},{el.country}
                 </li>
               ))}

@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
 import { ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import esClient from '../connections/elasticsearch';
-import redisClient from '../connections/redis';
 import { makeWildCard, Wildcard } from '../utils/makeWildCard';
 import catchAsyncError from '../catchAsyncError';
-
+import getAndSetRedisData from '../utils/getAndSetRedisData';
 const INDEX = 'restaurants';
 
 export const createRestaurant = catchAsyncError(
@@ -16,7 +15,6 @@ export const createRestaurant = catchAsyncError(
       },
     };
     await esClient.index(doc);
-
     res.status(201).json({
       message: 'Success ✅',
     });
@@ -40,43 +38,53 @@ export const searchRestaurants = catchAsyncError(
     const isValidIndex: ApiResponse = await esClient.indices.exists({
       index: INDEX,
     });
+    // Elastic index check
     if (!isValidIndex.body) {
       res.status(400).json({
         message: 'Not valid query🥲',
       });
       return;
     }
+
     const { s } = req.query;
     // filtering the string
     const filterSearchString =
       typeof s === 'string' ? s.toLocaleLowerCase().trim() : '';
 
-    // Creating wildcards for query
-    const wildCardOption = makeWildCard(
-      ['country', 'name'],
-      filterSearchString
-    );
+    /**
+     * Data get and Create hanler with redis
+     */
 
-    // TODO: create reusable query builder
-    const body: Body = {
-      query: {
-        bool: {
-          should: wildCardOption,
+    const createElasticData = async (): Promise<Object[]> => {
+      const wildCardOption = makeWildCard(
+        ['country', 'name'],
+        filterSearchString
+      );
+      const body: Body = {
+        query: {
+          bool: {
+            should: wildCardOption,
+          },
         },
-      },
+      };
+      const result: ApiResponse = await esClient.search({
+        index: INDEX,
+        from: 0,
+        size: 10,
+        body: body,
+      });
+
+      return result.body.hits.hits;
     };
 
-    const result: ApiResponse = await esClient.search({
-      index: INDEX,
-      from: 0,
-      size: 10,
-      body: body,
-    });
+    const results = await getAndSetRedisData(
+      filterSearchString,
+      createElasticData
+    );
 
     res.status(200).json({
-      message: 'Success✅',
-      count: result.body.hits.hits.length,
-      data: result.body.hits.hits,
+      message: 'success',
+      data: results,
     });
   }
 );
