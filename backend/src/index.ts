@@ -1,34 +1,30 @@
 import express, { Application, Request, Response } from 'express';
-import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
-import cities from './cities.json';
-
+import { ApiResponse } from '@elastic/elasticsearch';
+import client from './connections/elasticsearch';
 import cors from 'cors';
 const app: Application = express();
 const PORT = 9999;
 app.use(express.json());
-const client = new Client({
-  node: 'http://localhost:9200/',
-});
 
 const INDEX = 'restaurants';
 app.use(cors());
 // Create data
 app.post('/restaurant', async (req: Request, res: Response) => {
   try {
-    let body: any = [];
+    // let body: any = [];
 
-    cities.forEach((city: any) => {
-      body.push({
-        index: {
-          _index: 'restaurants',
-        },
-      });
-      body.push(city);
-    });
+    // cities.forEach((city: any) => {
+    //   body.push({
+    //     index: {
+    //       _index: 'restaurants',
+    //     },
+    //   });
+    //   body.push(city);
+    // });
 
-    console.log(body);
+    // console.log(body);
 
-    await client.bulk({ body: body });
+    // await client.bulk({ body: body });
     // const doc: RequestParams.Index = {
     //   index: INDEX,
     //   body: {
@@ -109,7 +105,7 @@ app.get('/search', async (req: Request, res: Response) => {
       const result: ApiResponse = await client.search({
         index: INDEX,
         from: 0,
-        size: 10000,
+        size: 10,
         body: body,
       });
 
