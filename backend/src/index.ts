@@ -1,12 +1,19 @@
 import express, { Application, Request, Response } from 'express';
 import { ApiResponse } from '@elastic/elasticsearch';
-import client from './connections/elasticsearch';
+import esClient from './connections/elasticsearch';
+import redisClient from './connections/redis';
 import cors from 'cors';
+import 'dotenv/config';
+
 const app: Application = express();
 const PORT = 9999;
 app.use(express.json());
-
 const INDEX = 'restaurants';
+
+redisClient.on('error', (err) => {
+  console.log(err);
+  console.log('Error occured while connecting or accessing redis server');
+});
 app.use(cors());
 // Create data
 app.post('/restaurant', async (req: Request, res: Response) => {
@@ -24,7 +31,7 @@ app.post('/restaurant', async (req: Request, res: Response) => {
 
     // console.log(body);
 
-    // await client.bulk({ body: body });
+    // await esClient.bulk({ body: body });
     // const doc: RequestParams.Index = {
     //   index: INDEX,
     //   body: {
@@ -34,7 +41,7 @@ app.post('/restaurant', async (req: Request, res: Response) => {
 
     // for (let i = 0; i <= 1000000; i++) {
     //   (doc.body as any)['random'] = String(i);
-    //   await client.index(doc);
+    //   await esClient.index(doc);
     // }
 
     res.status(201).json({
@@ -63,7 +70,7 @@ interface Body {
 // Search
 app.get('/search', async (req: Request, res: Response) => {
   try {
-    const isValidIndex: ApiResponse = await client.indices.exists({
+    const isValidIndex: ApiResponse = await esClient.indices.exists({
       index: INDEX,
     });
     if (isValidIndex.body) {
@@ -102,7 +109,7 @@ app.get('/search', async (req: Request, res: Response) => {
         },
       };
 
-      const result: ApiResponse = await client.search({
+      const result: ApiResponse = await esClient.search({
         index: INDEX,
         from: 0,
         size: 10,
