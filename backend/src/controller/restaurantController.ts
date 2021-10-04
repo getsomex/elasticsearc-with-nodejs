@@ -4,6 +4,7 @@ import esClient from '../connections/elasticsearch';
 import { makeWildCard, Wildcard } from '../utils/makeWildCard';
 import catchAsyncError from '../catchAsyncError';
 import getAndSetRedisData from '../utils/getAndSetRedisData';
+import { ElasticResponse } from '../interfaces/Elsticsearch';
 const INDEX = 'restaurants';
 
 export const createRestaurant = catchAsyncError(
@@ -54,16 +55,16 @@ export const searchRestaurants = catchAsyncError(
     /**
      * Data get and Create hanler with redis
      */
-
-    const createElasticData = async (): Promise<Object[]> => {
+    const createElasticData = async (): Promise<ElasticResponse> => {
       const wildCardOption = makeWildCard(
         ['country', 'name'],
         filterSearchString
       );
-      const body: Body = {
+      const body = {
         query: {
-          bool: {
-            should: wildCardOption,
+          multi_match: {
+            query: filterSearchString,
+            fields: ['name', 'country'],
           },
         },
       };
@@ -73,8 +74,8 @@ export const searchRestaurants = catchAsyncError(
         size: 10,
         body: body,
       });
-
-      return result.body.hits.hits;
+      console.log(result.body.suggest);
+      return result.body.hits;
     };
 
     const results = await getAndSetRedisData(
@@ -84,7 +85,9 @@ export const searchRestaurants = catchAsyncError(
 
     res.status(200).json({
       message: 'success',
-      data: results,
+      count: results.hits.length,
+      total: results.total.value,
+      data: results.hits,
     });
   }
 );
