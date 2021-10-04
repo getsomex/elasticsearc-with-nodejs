@@ -7,7 +7,7 @@
 - [x] Search data in elasticsearch
 - [x] Create routes folder
 - [x] Create controller
-- [ ] Create migrations for elasticsearch
-- [ ] Create rollback for elasticsearch
-- [] TBD: Create data in postgres or mongodb
-- [] TBD: Sync between postgres or mongodb and elasticsearch while creating data
+- [x] Create migrations for elasticsearch
+- [x] Create rollback for elasticsearch
+- [ ] TBD: Create data in postgres or mongodb
+- [ ] TBD: Sync between postgres or mongodb and elasticsearch while creating data

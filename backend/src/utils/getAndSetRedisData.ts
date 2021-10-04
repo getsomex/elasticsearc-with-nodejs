@@ -1,8 +1,9 @@
 import redisClient from '../connections/redis';
+import { ElasticResponse } from '../interfaces/Elsticsearch';
 const getAndSetRedisData = (
   key: string,
   cb: Function
-): Promise<Object[] | Error> => {
+): Promise<ElasticResponse> => {
   return new Promise((resolve, reject) => {
     redisClient.get(key, async (err, data: string | null) => {
       if (err) return reject(err);
