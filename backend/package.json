@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn ./src/index.ts",
+    "dev": "ts-node-dev --respawn ./src/server.ts",
     "build": "tsc",
     "migrate:make": "ts-node ./src/_migration-generator/createMigration.ts",
     "migrate": "ts-node ./src/_migration-generator/runMigrations.ts"
@@ -18,12 +18,14 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "mongoose": "^6.0.10",
     "redis": "^3.1.2",
     "ts-node-dev": "^1.1.8"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^16.10.2",
     "@types/redis": "^2.8.32",
     "nodemon": "^2.0.13",

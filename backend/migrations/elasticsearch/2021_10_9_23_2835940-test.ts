@@ -44,9 +44,28 @@ export const up = async () => {
           long: {
             type: 'integer',
           },
+
           foods: {
-            type: 'text',
+            properties: {
+              food_name: {
+                type: 'text',
+                fields: {
+                  keyword: {
+                    type: 'keyword',
+                  },
+                },
+              },
+              category: {
+                type: 'text',
+                fields: {
+                  keyword: {
+                    type: 'keyword',
+                  },
+                },
+              },
+            },
           },
+
           search_count: {
             type: 'integer',
           },
