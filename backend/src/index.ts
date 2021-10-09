@@ -3,23 +3,29 @@
  */
 import cors from 'cors';
 import 'dotenv/config';
-import App from './connections/server';
+import express, { Application } from 'express';
+
 /**
  * Custom modules
  */
 import restaurantRouter from './routes/restaurant';
 import globalErrorController from './controller/errorController/globalErrorController';
-import app from './connections/server';
 
-App.use(cors());
+const app: Application = express();
+
+app.use(express.json());
+
+app.use(cors());
 
 /**
  * Routes
  */
 // Restaurants
-App.use('/restaurants', restaurantRouter);
+app.use('/restaurants', restaurantRouter);
 /**
  * ErroController
  */
 
 app.use(globalErrorController);
+
+export default app;

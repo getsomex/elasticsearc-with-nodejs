@@ -11,7 +11,7 @@ export default (
    * 1) Server error and
    * 2) Client Erro
    */
-
+  console.log(err);
   res.status(500).json({
     message: 'Error something went wrong 🧨',
   });

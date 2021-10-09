@@ -5,6 +5,8 @@ import { makeWildCard, Wildcard } from '../utils/makeWildCard';
 import catchAsyncError from '../catchAsyncError';
 import getAndSetRedisData from '../utils/getAndSetRedisData';
 import { ElasticResponse } from '../interfaces/Elsticsearch';
+import mongoose from 'mongoose';
+import Restaurant from '../model/restaurant';
 const INDEX = 'restaurants';
 
 export const createRestaurant = catchAsyncError(
@@ -15,6 +17,7 @@ export const createRestaurant = catchAsyncError(
         ...req.body,
       },
     };
+    const response = await Restaurant.create(doc.body);
     await esClient.index(doc);
     res.status(201).json({
       message: 'Success ✅',

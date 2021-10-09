@@ -9,5 +9,6 @@
 - [x] Create controller
 - [x] Create migrations for elasticsearch
 - [x] Create rollback for elasticsearch
-- [ ] TBD: Create data in postgres or mongodb
-- [ ] TBD: Sync between postgres or mongodb and elasticsearch while creating data
+- [ ] Create mongodb docker container
+- [ ] Create data in mongodb
+- [ ] Sync between mongodb and elasticsearch while creating data
