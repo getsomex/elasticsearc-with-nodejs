@@ -12,7 +12,7 @@ const hour = date.getHours();
 const minutes = date.getMinutes();
 const seconds = date.getSeconds();
 const miliSeconds = date.getMilliseconds();
-const timeStamp = `${year}${month}${day}${hour}${minutes}${seconds}${miliSeconds}`;
+const timeStamp = `${year}_${month}_${day}_${hour}_${minutes}${seconds}${miliSeconds}`;
 
 const migrationDefaultText = `/**
 * Create Elasticsearch migration files😀

@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn ./src/index.ts",
     "build": "tsc",
-    "migrate": "ts-node ./src/migration-generator/createMigration.ts"
+    "migrate:make": "ts-node ./src/_migration-generator/createMigration.ts",
+    "migrate": "ts-node ./src/_migration-generator/runMigrations.ts"
   },
   "keywords": [],
   "author": "",
