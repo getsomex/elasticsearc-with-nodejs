@@ -1,41 +1,27 @@
 const fs = require('fs');
-const exec = require('child_process').exec;
 import path from 'path';
 const dir = path.resolve('migrations/elasticsearch/');
-const files = fs.readdirSync(dir); // reading files from folders
-const { fork } = require('child_process');
+const files: string[] = fs.readdirSync(dir); // reading files from folders
+const UP = 'up';
+const ROLLBACK = 'rollback';
+const arg = process.argv.slice(2)[0];
+if (!arg) {
+  throw new Error('provide argument either up or rollback');
+}
 
-files.forEach((file: string) => {
-  console.log(file);
-  exec(
-    `ts-node -e require(${dir}/${file}).up()`,
-    (error: any, stdout: any, stderr: any) => {
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
-      if (error !== null) {
-        console.log(`exec error: ${error}`);
-      }
-    }
-  );
-});
-// const funcs = files.map(function (file: string) {
-//   console.log('Hello');
-//   return exec.bind(null, `ts-node 'import ${scriptsFolder}${file}/up`);
-
-//   // execute node command
-// });
-// function getResults(err, data) {
-//   if (err) {
-//     return console.log(err)
-//   }
-//   const results = data.map(function(lines){
-//     return lines.join('') // joining each script lines
-//   })
-//   console.log(results)
-// }
-
-// // to run your scipts in parallel use
-// async.parallel(funcs, getResults)
-
-// // to run your scipts in series use
-// async.series(funcs, getResults)
+if (arg == UP) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    import(`${dir}/${file}`).then((val) => {
+      val.up();
+    });
+  }
+}
+if (arg == ROLLBACK) {
+  for (let i = files.length - 1; i >= 0; i--) {
+    const file = files[i];
+    import(`${dir}/${file}`).then((val) => {
+      val.down();
+    });
+  }
+}
