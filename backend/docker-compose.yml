@@ -31,17 +31,24 @@ services:
     depends_on:
       - elasticsearch
 
-  postgres:
-    image: postgres
-    container_name: postgres
+  mongo:
+    container_name: mongo
+    image: mongo
     ports:
-      - '5432:5432'
+      - 27019:27019
+    restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: restaurants
-    volumes:
-      - ./docker-data/postgres-data:/var/lib/postgresql/data
+      MONGO_INITDB_ROOT_USERNAME: ${DOKCER_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DOKCER_MONGO_PASSWORD}
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DOKCER_MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DOKCER_MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
   redis:
     image: 'redis:alpine'
