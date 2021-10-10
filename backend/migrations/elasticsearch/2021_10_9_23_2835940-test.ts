@@ -9,9 +9,7 @@ const INDEX = 'restaurants';
 export const up = async () => {
   await esClient.indices.create({
     index: INDEX,
-    body: {
-      esRestaurantSchema,
-    },
+    body: esRestaurantSchema,
   });
 };
 // rollback

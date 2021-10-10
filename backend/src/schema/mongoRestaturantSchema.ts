@@ -1,6 +1,7 @@
 const foodSchema = {
   category: Number,
-  food_name: [String],
+  food_name: String,
+  price: Number,
 };
 
 export default {
@@ -26,4 +27,5 @@ export default {
     required: true,
   },
   foods: [foodSchema],
+  ratings: Number,
 };
