@@ -65,9 +65,9 @@ export const searchRestaurants = catchAsyncError(
       );
       const body = {
         query: {
-          multi_match: {
-            query: filterSearchString,
-            fields: ['name', 'country'],
+          query_string: {
+            query: `*${filterSearchString}*`,
+            fields: ['location_name', 'restaurant_name', 'foods.food_name'],
           },
         },
       };
