@@ -29,6 +29,7 @@ export default (
    */
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
+  err = { ...err };
   if (err.name === 'ValidationError') {
     err = validationErrorDB(err);
   }
