@@ -1,24 +1,30 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import esClient from '../connections/elasticsearch';
 import { makeWildCard, Wildcard } from '../utils/makeWildCard';
 import catchAsyncError from '../catchAsyncError';
 import getAndSetRedisData from '../utils/getAndSetRedisData';
 import { ElasticResponse } from '../interfaces/Elsticsearch';
-import mongoose from 'mongoose';
 import Restaurant from '../model/restaurant';
+import RestaurantInterface from '../interfaces/RestaurantInterface';
+import BaseError from '../utils/BaseError';
 const INDEX = 'restaurants';
 
 export const createRestaurant = catchAsyncError(
   async (req: Request, res: Response) => {
-    const doc: RequestParams.Index = {
-      index: INDEX,
-      body: {
-        ...req.body,
-      },
-    };
-    const response = await Restaurant.create(doc.body);
-    await esClient.index(doc);
+    const body: RestaurantInterface = req.body;
+    const response = await Restaurant.create(body);
+    const mongoId = response._id.toString();
+    if (mongoId) {
+      const esBody = { ...body, mongo_id: mongoId };
+      const doc: RequestParams.Index = {
+        index: INDEX,
+        body: {
+          ...esBody,
+        },
+      };
+      await esClient.index(doc);
+    }
     res.status(201).json({
       message: 'Success ✅',
     });
@@ -77,7 +83,6 @@ export const searchRestaurants = catchAsyncError(
         size: 10,
         body: body,
       });
-      console.log(result.body.suggest);
       return result.body.hits;
     };
 

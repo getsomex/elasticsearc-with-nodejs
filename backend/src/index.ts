@@ -10,7 +10,8 @@ import express, { Application } from 'express';
  */
 import restaurantRouter from './routes/restaurant';
 import globalErrorController from './controller/errorController/globalErrorController';
-
+import BaseError from './utils/BaseError';
+import { ERROR_CODES } from './utils/constants';
 const app: Application = express();
 
 app.use(express.json());
@@ -27,5 +28,18 @@ app.use('/restaurants', restaurantRouter);
  */
 
 app.use(globalErrorController);
+
+app.all('*', (req, res, next) => {
+  // const err = new Error(`Can't find ${req.originalUrl} on this server`);
+  // err.status = 'fail';
+  // err.statusCode = 400;
+  next(
+    new BaseError(
+      404,
+      `Can't find ${req.originalUrl} on this server`,
+      ERROR_CODES.E10005
+    )
+  );
+});
 
 export default app;
