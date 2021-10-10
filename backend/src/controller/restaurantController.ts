@@ -7,17 +7,14 @@ import getAndSetRedisData from '../utils/getAndSetRedisData';
 import { ElasticResponse } from '../interfaces/Elsticsearch';
 import Restaurant from '../model/restaurant';
 import RestaurantInterface from '../interfaces/RestaurantInterface';
+import BaseError from '../utils/BaseError';
 const INDEX = 'restaurants';
 
 export const createRestaurant = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const body: RestaurantInterface = req.body;
     const response = await Restaurant.create(body);
     const mongoId = response._id.toString();
-    if (!mongoId) {
-      next(Error('Could not create data'));
-      return;
-    }
     if (mongoId) {
       const esBody = { ...body, mongo_id: mongoId };
       const doc: RequestParams.Index = {
@@ -86,7 +83,6 @@ export const searchRestaurants = catchAsyncError(
         size: 10,
         body: body,
       });
-      console.log(result.body.suggest);
       return result.body.hits;
     };
 
