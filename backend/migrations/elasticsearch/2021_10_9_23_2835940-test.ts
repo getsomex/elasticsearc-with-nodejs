@@ -14,6 +14,7 @@ export const up = async () => {
 };
 // rollback
 export const down = async () => {
+  console.log('hello');
   await esClient.indices.delete({
     index: INDEX,
   });

@@ -1,4 +1,24 @@
 const mappings = {
+  settings: {
+    analysis: {
+      filter: {
+        autocomplete_filter: {
+          type: 'edge_ngram',
+          min_gram: 2,
+          max_gram: 20,
+          token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+        },
+      },
+      analyzer: {
+        autocomplete: {
+          type: 'custom',
+          tokenizer: 'whitespace',
+          filter: ['lowercase', 'asciifolding', 'autocomplete_filter'],
+        },
+      },
+    },
+  },
+
   mappings: {
     properties: {
       mongo_id: {
@@ -11,6 +31,8 @@ const mappings = {
             type: 'keyword',
           },
         },
+        analyzer: 'autocomplete',
+        search_analyzer: 'standard',
       },
       category: {
         type: 'integer',
@@ -26,6 +48,8 @@ const mappings = {
             type: 'keyword',
           },
         },
+        analyzer: 'autocomplete',
+        search_analyzer: 'standard',
       },
       lat: {
         type: 'integer',
@@ -48,6 +72,8 @@ const mappings = {
                 type: 'keyword',
               },
             },
+            analyzer: 'autocomplete',
+            search_analyzer: 'standard',
           },
           price: {
             type: 'integer',
@@ -64,6 +90,9 @@ const mappings = {
       },
       search_count: {
         type: 'integer',
+      },
+      logo: {
+        type: 'text',
       },
       ratings: {
         type: 'integer',

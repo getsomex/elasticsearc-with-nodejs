@@ -72,7 +72,7 @@ export const searchRestaurants = catchAsyncError(
       const body = {
         query: {
           query_string: {
-            query: `*${filterSearchString}*`,
+            query: filterSearchString,
             fields: ['location_name', 'restaurant_name', 'foods.food_name'],
           },
         },
