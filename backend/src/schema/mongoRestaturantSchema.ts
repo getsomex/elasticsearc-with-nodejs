@@ -2,6 +2,7 @@ const foodSchema = {
   category: Number,
   food_name: String,
   price: Number,
+  img_url: String,
 };
 
 export default {
@@ -27,5 +28,8 @@ export default {
     required: true,
   },
   foods: [foodSchema],
+  logo: {
+    type: String,
+  },
   ratings: Number,
 };
